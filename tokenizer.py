@@ -31,7 +31,7 @@ def extract_words(sentence):
     return word_tokenize(sentence)
 
 
-def article2words(artice):
+def article2words(article):
     return [extract_words(sentence) for sentence in extract_sentences(article)]
 
 if __name__ == "__main__":
