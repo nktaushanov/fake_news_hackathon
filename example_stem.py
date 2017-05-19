@@ -5,7 +5,7 @@ import utils
 
 
 STEMMING_RULES_FILE = utils.get_project_file_path(
-        'data', 'stemming_rules', 'stem_rules_2.txt'
+        'resources', 'stemming_rules', 'stem_rules_2.txt'
 )
 
 
