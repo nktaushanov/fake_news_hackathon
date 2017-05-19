@@ -1,0 +1,9 @@
+mentions_full_names_01.lst:mention:full_name
+mentions_lastnames.lst:mention:last_name
+mentions_modifiers.lst:mention:modifier
+mentions_nicknames_similar3.lst:mention:nickname
+mentions_nicknames_small.lst:mention:nickname
+mentions_politics.lst:mention:politic_name
+mentions_politics_firstnames.lst:mention:first_name
+mentions_shortened.lst:mention:shortened_names
+mentions_softnames.lst:mention:soft_names
