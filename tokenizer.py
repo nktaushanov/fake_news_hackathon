@@ -31,6 +31,9 @@ def extract_words(sentence):
     return word_tokenize(sentence)
 
 
+def article2words(artice):
+    return [extract_words(sentence) for sentence in extract_sentences(article)]
+
 if __name__ == "__main__":
     import pandas as pd
     df = pd.read_csv('data/main_data_fake_news.csv', encoding='utf8')
