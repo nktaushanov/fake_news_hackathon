@@ -12,3 +12,15 @@ def get_project_file_path(*args):
     """Get filepath relative to the project home directory."""
     current_dir = os.path.dirname(os.path.realpath(__file__))
     return apply(os.path.join, [current_dir] + list(args))
+
+def flatten(arr):
+    result = []
+
+    for x in arr:
+        if isinstance(x, list):
+            result.extend(flatten(x))
+        else:
+            result.append(x)
+
+    return result
+
