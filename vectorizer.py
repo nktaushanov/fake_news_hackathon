@@ -5,11 +5,11 @@ import re
 from collections import defaultdict
 
 import numpy as np
-from gensim.models import keyedvectors
 from sklearn.feature_extraction import text
 
 import utils
 import tokenizer
+import word2vec
 
 class MeanEmbeddingVectorizer(object):
     def __init__(self, word2vec):
@@ -60,11 +60,7 @@ if __name__ == "__main__":
     import pandas as pd
     df = pd.read_csv('data/main_data_fake_news.csv', encoding='utf8')
     content = list(df['content'])
-    word_vectors = keyedvectors.KeyedVectors.load_word2vec_format(
-            utils.get_project_file_path('data/bg.bin'),
-            binary=True,
-            encoding='utf8',
-            unicode_errors='ignore')
+    word_vectors = word2vec.get_word_vectors()
 
     article_words = utils.flatten(tokenizer.article2words(content[0]))
     print MeanEmbeddingVectorizer(word_vectors).transform([article_words])
