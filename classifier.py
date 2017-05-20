@@ -128,7 +128,7 @@ def combined_classifier(df):
     eval_domain_vectors = domain_fit_fector.transform(eval_domain_preprocessed)
     eval_combined_vectors = sparse.hstack((eval_articles_vectors, eval_domain_vectors))
     eval_scores = list(eval_df['fake_news_score'])
-    
+
     print classifier.score(eval_combined_vectors, eval_scores)
 
 

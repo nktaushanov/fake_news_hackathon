@@ -32,14 +32,15 @@ class MeanEmbeddingVectorizer(object):
 
 
 class TfidfEmbeddingVectorizer(object):
-    def __init__(self, word2vec):
+    def __init__(self, word2vec, tfidf_word_transform=lambda x: x):
         self.word2vec = word2vec
         self.word2weight = None
         self.dim = word2vec.vector_size
+        self.tfidf_word_transform = tfidf_word_transform
 
     def fit(self, X, y=None):
         tfidf = text.TfidfVectorizer(analyzer=lambda x: x)
-        tfidf.fit(X)
+        tfidf.fit([[self.tfidf_word_transform(word) for word in words] for words in X])
         # if a word was never seen - it must be at least as infrequent
         # as any of the known words - so the default idf is the max of
         # known idf's
@@ -52,7 +53,7 @@ class TfidfEmbeddingVectorizer(object):
 
     def transform(self, X):
         return np.array([
-                np.mean([self.word2vec[w] * self.word2weight[w]
+                np.mean([self.word2vec[w] * self.word2weight[self.tfidf_word_transform(w)]
                          for w in words if w in self.word2vec] or
                         [np.zeros(self.dim)], axis=0)
                 for words in X
