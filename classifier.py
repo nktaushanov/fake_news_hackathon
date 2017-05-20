@@ -4,6 +4,8 @@ import os
 
 from sklearn import tree
 from sklearn.feature_extraction import text
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.svm import LinearSVC
 from scipy import sparse
 import numpy as np
 import pandas as pd
@@ -20,6 +22,48 @@ def vectorize_column(df_column, vectorizer, tokenize):
 
 def preprocess_text(df_column, tokenize):
     return [tokenize(value) for value in list(df_column)]
+
+def my_score():
+    score_column = 'fake_news_score'
+    df = corpora.train_set('FN_Training_Set.csv')
+    vector = get_sv_vector(df)
+    classifier = get_sv_classifier(df, transform_sv_vector(vector, df), score_column)
+
+    print classifier.score(transform_sv_vector(vector, df), list(df[score_column]))
+
+    df = corpora.train_set('FN_Evaluation_Set_Small.csv')
+    print classifier.score(transform_sv_vector(vector, df), list(df[score_column]))
+
+
+def get_sv_vector(df):
+    vector = text.CountVectorizer(analyzer=lambda x: x)
+    vector.fit([[x] for x in list(df['Content Url'])])
+    return vector
+
+def transform_sv_vector(vector, df):
+    return vector.transform([[x] for x in list(df['Content Url'])])
+
+
+def get_sv_classifier(df, transformed_vector, score_column):
+    scores = list(df[score_column])
+    classifier = LinearSVC()
+    classifier.fit(transformed_vector, scores)
+
+    # print [x for x in classifier.decision_function(transformed_vector) if abs(x) < 0.5]
+    # print classifier.score(transformed_vector, scores)
+
+
+    # eval_df = corpora.train_set('FN_Evaluation_Set_Small.csv')
+    # eval_vector = vector.transform([[x] for x in list(eval_df['Content Url'])])
+    # eval_scores = list(eval_df['fake_news_score'])
+
+    # print classifier.decision_function(eval_vector)
+    # print [x for x in classifier.decision_function(eval_vector) if abs(x) > 0.5]
+
+    # print classifier.score(eval_vector, eval_scores)
+
+    return classifier
+
 
 
 def content_dicision_tree(df):
@@ -90,7 +134,6 @@ def combined_classifier(df):
 
 
 
-
 if __name__ == "__main__":
     df = corpora.train_set('FN_Training_Set.csv')
-    combined_classifier(df)
+    my_score()
