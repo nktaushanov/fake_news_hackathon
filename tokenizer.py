@@ -12,6 +12,9 @@ STEMMING_RULES_FILE = utils.get_project_file_path(
 
 SENTENCE_SPLIT_REGEX = re.compile(u'^(.*[\.?!])([А-Я][а-я].*)$', re.U)
 
+PUNCTUATION = re.compile(u'^[,\.;:\?!-+"•\'-]+$', re.U)
+
+
 def split_sentences(sentence):
     matches = SENTENCE_SPLIT_REGEX.match(sentence)
     if matches and matches.groups():
@@ -28,7 +31,7 @@ def extract_sentences(document):
 
 
 def extract_words(sentence):
-    return word_tokenize(sentence)
+    return [word for word in word_tokenize(sentence) if not PUNCTUATION.match(word)]
 
 
 def article2words(article):
