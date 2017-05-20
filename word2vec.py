@@ -6,7 +6,7 @@ import utils
 
 def get_word_vectors():
     return keyedvectors.KeyedVectors.load_word2vec_format(
-        utils.get_project_file_path('resources', 'bg.bin'),
+        utils.get_project_file_path('resources', 'big', 'bg.bin'),
         binary=True,
         encoding='utf8',
         unicode_errors='ignore')

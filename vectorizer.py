@@ -7,9 +7,11 @@ from collections import defaultdict
 import numpy as np
 from sklearn.feature_extraction import text
 
+import corpora
 import utils
 import tokenizer
 import word2vec
+
 
 class MeanEmbeddingVectorizer(object):
     def __init__(self, word2vec):
@@ -58,7 +60,7 @@ class TfidfEmbeddingVectorizer(object):
 
 if __name__ == "__main__":
     import pandas as pd
-    df = pd.read_csv('data/main_data_fake_news.csv', encoding='utf8')
+    df = corpora.main_data()
     content = list(df['content'])
     word_vectors = word2vec.get_word_vectors()
 
