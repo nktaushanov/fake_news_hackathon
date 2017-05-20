@@ -10,8 +10,9 @@ from sklearn import tree
 import tokenizer
 import utils
 import vectorizer
+import nltk
 
-
+nltk.download('punkt')
 
 if __name__ == "__main__":
     df = pd.read_csv('data/FN_Training_Set.csv', encoding='utf8')
