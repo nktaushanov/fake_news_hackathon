@@ -15,6 +15,7 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.neural_network import MLPClassifier
 from sklearn.svm import SVC
 from sklearn.tree import DecisionTreeClassifier
+from sklearn import metrics
 import numpy as np
 import pandas as pd
 
@@ -30,20 +31,42 @@ import word2vec
 STEMMING_RULES_FILE = utils.get_project_file_path(
         'resources', 'stemming_rules', 'stem_rules_2.txt')
 
+class EnsembleClassifier(object):
+    def __init__(self, decision_tree, nn):
+        self.decision_tree = decision_tree
+        self.nn = nn
+
+    def fit(self, X, y):
+        self.decision_tree.fit(X, y)
+        self.nn.fit(X, y)
+
+    def predict(self, X):
+        nn_proba = np.max(self.nn.predict_proba(X), axis=1)
+        nn_predicts = self.nn.predict(X)
+        nn = zip(nn_proba, nn_predicts)
+
+        decision_tree_predicts = self.decision_tree.predict(X)
+
+        return [nn_predict if nn_prob > 0.8 else decision_tree_predict
+                for ((nn_prob, nn_predict), decision_tree_predict) in zip(nn, decision_tree_predicts)]
+
+    def score(self, X, y):
+        return metrics.accuracy_score(y, self.predict(X))
+
 
 CLASSIFIERS = {
     # "Nearest Neighbors": KNeighborsClassifier(3),
     # "Linear SVM": SVC(kernel="linear", C=0.025),
     # "RBF SVM": SVC(gamma=2, C=1),
     # "Gaussian Process": GaussianProcessClassifier(1.0 * RBF(1.0), warm_start=True),
-    # "Decision Tree": DecisionTreeClassifier(max_depth=10),
+    "Decision Tree": DecisionTreeClassifier(),
     # "Random Forest": RandomForestClassifier(max_depth=10, n_estimators=10),
     "Neural Net": MLPClassifier((50, 5), alpha=.01, learning_rate='adaptive'),
+    "Magic": EnsembleClassifier(DecisionTreeClassifier(), MLPClassifier((50, 5), alpha=.01, learning_rate='adaptive')),
     # "AdaBoost": AdaBoostClassifier(),
     # "Naive Bayes": GaussianNB(),
     # "QDA": QuadraticDiscriminantAnalysis()
     }
-
 
 def cross_evaluate(data, labels, classifiers):
     # X_train, X_test, y_train, y_test = train_test_split(
@@ -94,12 +117,12 @@ def run_test():
     main_set = corpora.main_data()
 
     # train = train.append(train[train.fake_news_score == 1])
-    train['fake_news_score'] = (train.fake_news_score == 1).apply(lambda c: 1 if c else -1)
-    test['fake_news_score'] = (test.fake_news_score == 1).apply(lambda c: 1 if c else -1)
+    train['fake_news_score'] = (train.fake_news_score == 1)#.apply(lambda c: 1 if c else -1)
+    test['fake_news_score'] = (test.fake_news_score == 1)#.apply(lambda c: 1 if c else -1)
 
     tokenize = lambda article: tokenizer.article2words(article, flatten=True)
     # stemmer = bulstem.BulStemmer(STEMMING_RULES_FILE)
-    word_transform = lambda word: word #stemmer.stem(word.lower())
+    # word_transform = lambda word: word #stemmer.stem(word.lower())
     content_vectorizer = vectorizer.MeanEmbeddingVectorizer(
     # content_vectorizer = vectorizer.TfidfEmbeddingVectorizer(
             word2vec.get_word_vectors())
