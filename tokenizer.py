@@ -34,8 +34,13 @@ def extract_words(sentence):
     return [word for word in word_tokenize(sentence) if not PUNCTUATION.match(word)]
 
 
-def article2words(article):
-    return [extract_words(sentence) for sentence in extract_sentences(article)]
+def article2words(article, flatten=False):
+    sentence_words = [extract_words(sentence) for sentence in extract_sentences(article)]
+    if flatten:
+        return utils.flatten(sentence_words)
+    else:
+        return sentence_words
+
 
 if __name__ == "__main__":
     import pandas as pd

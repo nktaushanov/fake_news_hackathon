@@ -3,6 +3,7 @@ import os
 import pickle
 
 from path import Path
+from urlparse import urlparse
 
 def print_unicode(obj):
     """Print unicode object represenation."""
@@ -23,4 +24,7 @@ def flatten(arr):
             result.append(x)
 
     return result
+
+def get_domain(url):
+    return urlparse(url).netloc
 
