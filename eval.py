@@ -38,7 +38,7 @@ CLASSIFIERS = {
     # "Gaussian Process": GaussianProcessClassifier(1.0 * RBF(1.0), warm_start=True),
     # "Decision Tree": DecisionTreeClassifier(max_depth=10),
     # "Random Forest": RandomForestClassifier(max_depth=10, n_estimators=10),
-    "Neural Net": MLPClassifier((50, 5), alpha=.1, learning_rate='adaptive'),
+    "Neural Net": MLPClassifier((50, 5), alpha=.01, learning_rate='adaptive'),
     # "AdaBoost": AdaBoostClassifier(),
     # "Naive Bayes": GaussianNB(),
     # "QDA": QuadraticDiscriminantAnalysis()
@@ -64,7 +64,7 @@ def run_cross_evaluation():
     main_set = corpora.main_data()
 
     tokenize = lambda article: tokenizer.article2words(article, flatten=True)
-    # articles_words = [tokenize(article) for article in list(main_set['content'])]
+    main_set_words = [tokenize(article) for article in list(main_set['content'])]
     articles_words = [tokenize(article) for article in list(df['Content Title'])]
     # content_vectorizer = text.TfidfVectorizer(analyzer=lambda x: x, max_features=200)
 
@@ -73,7 +73,7 @@ def run_cross_evaluation():
     word_transform = lambda word: word #stemmer.stem(word.lower())
     content_vectorizer = vectorizer.TfidfEmbeddingVectorizer(
             word2vec.get_word_vectors(), tfidf_word_transform=word_transform)
-    content_vectorizer.fit(articles_words)
+    content_vectorizer.fit(main_set_words)
 
     titles = [tokenize(title) for title in list(df['Content Title'])]
     articles_vectors = content_vectorizer.transform(titles)
@@ -91,21 +91,27 @@ def run_cross_evaluation():
 def run_test():
     train = corpora.train_set('FN_Training_Set.csv')
     test = corpora.train_set('FN_Evaluation_Set_Only.csv')
+    main_set = corpora.main_data()
 
     # train = train.append(train[train.fake_news_score == 1])
+    train['fake_news_score'] = (train.fake_news_score == 1).apply(lambda c: 1 if c else -1)
+    test['fake_news_score'] = (test.fake_news_score == 1).apply(lambda c: 1 if c else -1)
 
     tokenize = lambda article: tokenizer.article2words(article, flatten=True)
     # stemmer = bulstem.BulStemmer(STEMMING_RULES_FILE)
     word_transform = lambda word: word #stemmer.stem(word.lower())
     content_vectorizer = vectorizer.MeanEmbeddingVectorizer(
+    # content_vectorizer = vectorizer.TfidfEmbeddingVectorizer(
             word2vec.get_word_vectors())
             # word2vec.get_word_vectors(), tfidf_word_transform=word_transform)
 
-    train_articles_words = classifier.preprocess_text(train['Content Title'], tokenize)
-    content_vectorizer.fit(train_articles_words)
+    # main_set_words = [tokenize(article) for article in list(main_set['content'])]
+    # content_vectorizer.fit(main_set_words)
+
+    train_articles_words = classifier.preprocess_text(train['Content'], tokenize)
     train_article_vectors = content_vectorizer.transform(train_articles_words)
     test_article_vectors = content_vectorizer.transform(
-            classifier.preprocess_text(test['Content Title'], tokenize))
+            classifier.preprocess_text(test['Content'], tokenize))
 
 
     domain_vectorizer = text.CountVectorizer(analyzer=lambda x: x)
