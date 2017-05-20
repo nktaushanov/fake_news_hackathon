@@ -74,7 +74,7 @@ def combined_classifier(df):
     print classifier.score(combined_vectors, scores)
 
 
-    eval_df = corpora.train_set('FN_Evaluation_Set.csv')
+    eval_df = corpora.train_set('FN_Evaluation_Set_Small.csv')
     eval_article_preprocessed = preprocess_text(eval_df['Content'],
             lambda article: tokenizer.article2words(article, flatten=True))
     eval_domain_preprocessed = preprocess_text(eval_df['Content Url'],
