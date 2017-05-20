@@ -2,7 +2,6 @@ import io
 import os
 import pickle
 
-from path import Path
 from urlparse import urlparse
 
 def print_unicode(obj):
