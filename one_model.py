@@ -13,6 +13,7 @@ from sklearn.svm import LinearSVC
 from sklearn.svm import SVC
 from sklearn.tree import DecisionTreeClassifier
 from sklearn import metrics
+from sklearn import preprocessing
 import numpy as np
 import pandas as pd
 
@@ -26,14 +27,14 @@ import word2vec
 
 
 class Classifier(object):
-    def __init__(self, classifier, vectorizer, score):
+    def __init__(self, classifier, vectorizer, column_name):
         self.classifier = classifier
         self.vectorizer = vectorizer
-        self.score = score
+        self.column_name = column_name
 
     def fit(self, data):
         self.vectorizer.fit(data)
-        X, y = self.vectorizer.transform(data), self.score(data)
+        X, y = self.vectorizer.transform(data), data[self.column_name]
         self.classifier.fit(X, y)
 
     def predict(self, data):
@@ -125,21 +126,20 @@ class NNVectorizer(object):
         domain_words = [utils.get_domain(value) for value in list(df['Content Url'])]
         domain_vectors = self.domain_vectorizer.transform(domain_words)
 
-        return sparse.hstack((article_vectors, domain_vectors))
+        return sparse.hstack((domain_vectors, article_vectors))
 
 
 class OneModel(object):
     def __init__(self, score_column_name):
-        score = lambda df: df[score_column_name]
         decision_fn = DecisionFn(score)
 
         decision_tree = Classifier(
-                DecisionTreeClassifier(), DecisionTreeVectorizer(), score)
+                DecisionTreeClassifier(), DecisionTreeVectorizer(), score_column_name)
 
         nn = Classifier(
                 MLPClassifier((50, 5), alpha=.01, learning_rate='adaptive'),
                 NNVectorizer(),
-                score)
+                score_column_name)
 
         self.model = Model(decision_fn, nn, decision_tree)
 
