@@ -51,7 +51,7 @@ class DecisionFn(object):
     def fit(self, df):
         self.vectorizer.fit(self._get_words(df))
         X = self.vectorizer.transform(self._get_words(df))
-        y = df[column_name]
+        y = df[self.column_name]
         self.classifier.fit(X, y)
 
     def match(self, df):
