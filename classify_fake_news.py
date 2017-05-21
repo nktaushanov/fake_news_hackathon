@@ -2,6 +2,7 @@ import argparse
 import pickle
 import pandas as pd
 from classification_model import TwoModels
+import csv
 
 def main():
 	parser = argparse.ArgumentParser(description='Process some integers.')
@@ -17,6 +18,8 @@ def main():
                     help='Input bin file to load an already trained model. (for classification only)')
 	parser.add_argument('--classified_output_csv', type=str, 
                     help='Output csv file to save an the classification result. (for classification only)')
+	parser.add_argument('--classified_output_xls', type=str, 
+                    help='Output excel file to save an the classification result. (for classification only) (optional)')
 	args = parser.parse_args()
 
 	if args.train_csv is not None:
@@ -50,7 +53,9 @@ def do_classification(args):
 	model = pickle.load(pkl_file)
 
 	classified_df = model.classify(df)
-	classified_df.to_csv(args.classified_output_csv)
+	classified_df.to_csv(args.classified_output_csv, encoding='utf8', index=False, quoting=csv.QUOTE_NONNUMERIC)
+	if args.classified_output_xls is not None:
+		classified_df.to_excel(args.classified_output_xls, encoding='utf8', index=False)
 
 
 
