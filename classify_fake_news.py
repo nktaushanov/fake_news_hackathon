@@ -36,6 +36,8 @@ def do_training(args):
 
 
 	df = pd.read_csv(args.train_csv, encoding='utf8')
+	df = fix_missing_values(df)
+
 	model = TwoModels().train(df)
 	file = open(args.save_model_bin, 'wb')
 	pickle.dump(model, file)
@@ -48,6 +50,8 @@ def do_classification(args):
 		exit()
 
 	df = pd.read_csv(args.classify_input_csv, encoding='utf8')
+	df = fix_missing_values(df)
+
 
 	pkl_file = open(args.load_model_bin, 'rb')
 	model = pickle.load(pkl_file)
@@ -57,6 +61,12 @@ def do_classification(args):
 	if args.classified_output_xls is not None:
 		classified_df.to_excel(args.classified_output_xls, encoding='utf8', index=False)
 
+def fix_missing_values(df):
+	df['is_basestring'] = df['Content'].apply(lambda c: isinstance(c, basestring))
+	df.loc[df['is_basestring'] == False, 'Content'] = ""
+	df.loc[df['is_basestring'] == False, 'Content Url'] = ""
+	df.drop('is_basestring', axis=1, inplace=True)
+	return df
 
 
 if __name__ == "__main__":

@@ -26,6 +26,9 @@ import vectorizer
 import word2vec
 
 
+def identity(x):
+    return x
+    
 class Classifier(object):
     def __init__(self, classifier, vectorizer, column_name):
         self.classifier = classifier
@@ -45,7 +48,7 @@ class Classifier(object):
 class DecisionFn(object):
     def __init__(self, column_name):
         self.column_name = column_name
-        self.vectorizer = text.CountVectorizer(analyzer=lambda x: x)
+        self.vectorizer = text.CountVectorizer(analyzer=identity)
         self.classifier = LinearSVC()
 
     def fit(self, df):
@@ -86,8 +89,8 @@ class Model(object):
 
 class DecisionTreeVectorizer(object):
     def __init__(self):
-        self.article_fit_vector = text.CountVectorizer(analyzer=lambda x: x)
-        self.domain_fit_fector = text.CountVectorizer(analyzer=lambda x: x)
+        self.article_fit_vector = text.CountVectorizer(analyzer=identity)
+        self.domain_fit_fector = text.CountVectorizer(analyzer=identity)
 
     def fit(self, df):
         article_preprocessed = preprocess_text(df['Content Title'],
@@ -112,7 +115,7 @@ class NNVectorizer(object):
     def __init__(self):
         self.content_vectorizer = vectorizer.MeanEmbeddingVectorizer(
                 word2vec.get_word_vectors())
-        self.domain_vectorizer = text.CountVectorizer(analyzer=lambda x: x)
+        self.domain_vectorizer = text.CountVectorizer(analyzer=identity)
 
     def fit(self, df):
         domain_words = [utils.get_domain(value) for value in list(df['Content Url'])]
@@ -145,6 +148,7 @@ class OneModel(object):
 
     def train(self, df):
         self.model.train(df)
+        return self
 
     def classify(self, df):
         return self.model.classify(df)
