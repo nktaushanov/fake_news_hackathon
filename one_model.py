@@ -43,15 +43,15 @@ class Classifier(object):
 
 
 class DecisionFn(object):
-    def __init__(self, score):
-        self.score = score
+    def __init__(self, column_name):
+        self.column_name = column_name
         self.vectorizer = text.CountVectorizer(analyzer=lambda x: x)
         self.classifier = LinearSVC()
 
     def fit(self, df):
         self.vectorizer.fit(self._get_words(df))
         X = self.vectorizer.transform(self._get_words(df))
-        y = self.score(df)
+        y = df[column_name]
         self.classifier.fit(X, y)
 
     def match(self, df):
@@ -131,7 +131,7 @@ class NNVectorizer(object):
 
 class OneModel(object):
     def __init__(self, score_column_name):
-        decision_fn = DecisionFn(score)
+        decision_fn = DecisionFn(score_column_name)
 
         decision_tree = Classifier(
                 DecisionTreeClassifier(), DecisionTreeVectorizer(), score_column_name)
