@@ -1,17 +1,12 @@
-import one_model
+from one_model import OneModel
 
 class TwoModels:
-	fake_model = None
-	bait_model = None
-
 	def train(self, df):
-		fake_model = 1
-		bait_model = 2
+		self.fake_model = OneModel("fake_news_score").train(df)
+		self.bait_model = OneModel("click_bait_score").train(df)
 		return self
 
 	def classify(self, df):
-		# using fake
-		df["fake_result"] = 3
-		# using bate
-		df["bate_result"] = 3
+		df["fake_result"] = self.fake_model.classify(df)
+		df["bait_result"] = self.bait_model.classify(df)
 		return df
