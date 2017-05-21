@@ -156,7 +156,14 @@ def run_test():
 
 
 def main():
-    run_test()
+    # run_test()
+    train = corpora.train_set('FN_Training_Set.csv')
+    test = corpora.train_set('FN_Evaluation_Set_Only.csv')
+    import one_model
+    model = one_model.OneModel('fake_news_score')
+    model.train(train)
+    predictions = model.classify(test)
+    print metrics.accuracy_score(list(test['fake_news_score']), predictions)
 
 
 if __name__ == "__main__":
